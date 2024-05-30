@@ -1,18 +1,8 @@
+use rustpad::rustl1;
 use std::any;
 
-// Function-Like Macro
-// macro_rules! wrap_with_logging {
-//     ($function:expr) => {{
-//         let name = std::any::type_name::<impl FnOnce()>(_function);
-//         println!("Start running function: {}", name);
-//         $function();
-//         println!("Success!");
-//     }};
-// }
-
 fn main() {
-    fn_wrapper(hackquest_day2);
-    // wrap_with_logging!(hackquest_day2);
+    // fn_wrapper(hackquest_day2);
 }
 
 // this wrapper function can be turned into a declarative macro
