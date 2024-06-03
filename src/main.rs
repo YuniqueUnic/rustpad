@@ -3,6 +3,7 @@ use std::any;
 
 fn main() {
     // fn_wrapper(hackquest_day2);
+    rustl1::question3(100);
 }
 
 // this wrapper function can be turned into a declarative macro

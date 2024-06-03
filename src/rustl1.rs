@@ -16,7 +16,10 @@
     编写一个函数，生成 n 阶的斐波那契数列。
 */
 
-use std::{io::Error, result::Result};
+use std::{
+    io::{Error, ErrorKind},
+    result::Result,
+};
 
 // The question 1
 pub fn question1(num: i32) {
@@ -115,7 +118,31 @@ fn look_num(num: i32, nums: &[i32]) -> Result<(bool, Vec<usize>), Error> {
     Ok((indcies.is_empty(), indcies))
 }
 
-// The question 3
-pub fn question3() -> Vec<u32> {
-    Vec::from([1; 10])
+pub fn question3(level: usize) {
+    let result = fibonacci(level);
+    println!("The result of {:?} level of fibonacci: {:?}", level, result);
+}
+
+fn fibonacci(level: usize) -> Result<Vec<u128>, Error> {
+    let mut fibo: Vec<u128> = Vec::new();
+    if level < 1 {
+        eprintln!("The level num cannot less than 1");
+        return Err(ErrorKind::InvalidData.into());
+    }
+
+    match level {
+        1 => fibo.push(1),
+        2 => fibo.extend_from_slice(&[1, 1]),
+        3 => fibo.extend_from_slice(&[1, 1, 2]),
+        _ => {
+            fibo.extend_from_slice(&[1, 1, 2]);
+            // level >= 4
+            for i in 3..=level - 1 {
+                let next = fibo[i - 2] + fibo[i - 1];
+                fibo.push(next);
+            }
+        }
+    }
+
+    return Ok(fibo);
 }
