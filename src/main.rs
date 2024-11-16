@@ -1,9 +1,25 @@
-use rustpad::rustl1;
-use std::any;
+use rustpad::{
+    extract_srt::{extract_to, Separator},
+    rustl1,
+};
+use std::{any, io};
 
-fn main() {
+fn main() -> io::Result<()> {
     // fn_wrapper(hackquest_day2);
-    rustl1::question3(100);
+    // rustl1::question3(100);
+    let sep = std::env::args().nth(1).expect("please provide a separator");
+    let sep = if sep == "-n" {
+        Separator::NEWLINE
+    } else {
+        Separator::SPACE
+    };
+
+    let input = std::env::args()
+        .nth(2)
+        .expect("please provide an input file path");
+    let output = std::env::args().nth(3).unwrap_or("output.srt".into());
+
+    extract_to(input, output, sep)
 }
 
 // this wrapper function can be turned into a declarative macro
