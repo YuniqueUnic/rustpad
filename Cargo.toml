@@ -8,5 +8,5 @@ edition = "2021"
 [dependencies]
 
 [[example]]
-name = "Cells"
-path = "examples/cells/lib.rs"
+name = "smtpointers"
+path = "examples/smtpointers/lib.rs"
