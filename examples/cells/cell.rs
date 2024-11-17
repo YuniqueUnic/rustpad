@@ -3,6 +3,57 @@ use std::{
     cell::{Cell, RefCell},
 };
 
+#[derive(Debug)]
+struct CellPoint {
+    // CellPoint is not thread safe due to it can used on more situations
+    // and it's performance is lower than Point that CellPoint wrapped by the Cell
+    // which has some checks & operations during runtime
+    x: Cell<i32>,
+    y: Cell<i32>,
+}
+
+#[derive(Debug)]
+struct Point {
+    // Point is thread safe because it limited by the ownership rule directly,
+    // and the performance of Point is good than Cell wrapped type.
+    x: i32,
+    y: i32,
+}
+
+impl Point {
+    fn new(x: i32, y: i32) -> Self {
+        Point { x, y }
+    }
+    fn move_by(&mut self, dx: i32, dy: i32) {
+        self.x = self.x + dx;
+        self.y = self.y + dy;
+    }
+    fn get_position(&self) -> (i32, i32) {
+        (self.x, self.y)
+    }
+}
+
+impl CellPoint {
+    fn new(x: i32, y: i32) -> Self {
+        CellPoint {
+            x: Cell::new(x),
+            y: Cell::new(y),
+        }
+    }
+    fn move_by(&self, dx: i32, dy: i32) {
+        self.x.set(self.x.get() + dx);
+        self.y.set(self.y.get() + dy);
+    }
+    fn get_position(&self) -> (i32, i32) {
+        (self.x.get(), self.y.get())
+    }
+}
+fn point_test() {
+    let point = CellPoint::new(0, 0);
+    point.move_by(5, 10);
+    println!("{:?}", point.get_position()); // 输出：(5, 10)
+}
+
 pub fn cell_test() {
     let c = Counter::new();
     dbg!(&c); // last_value: -1, value: 0
