@@ -10,3 +10,7 @@ edition = "2021"
 [[example]]
 name = "smtpointers"
 path = "examples/smtpointers/lib.rs"
+
+[[example]]
+name = "rustonehour"
+path = "examples/rust-one-hour/lib.rs"
