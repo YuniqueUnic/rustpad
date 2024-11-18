@@ -1,9 +1,41 @@
-const GLOBAL_CONST_VALUE: &'static str = "我是全局常量";
-static GLOBAL_STATIC_VALUE: &'static str = "我是全局不可变静态变量";
-static mut GLOBAL_STATIC_MUT_VALUE: &'static str = "我是全局可变静态变量";
-
 fn main() {
-    owership::struct_methods::struct_methods_test();
+    // value_types::basic_types::basic_types_test();
+    // value_types::basic_types::const_static_test();
+
+    // owership::struct_methods::struct_methods_test();
+}
+
+mod value_types {
+    pub mod basic_types {
+        pub fn basic_types_test() {
+            let i: i32 = 5;
+            let f: f32 = 5.0;
+            let b: bool = true;
+            let c: char = 'a';
+            let s: String = String::from("hello");
+            let s_1: &str = "hello";
+            let t: (i32, f32) = (5, 5.0);
+            let t_1: [i32; 5] = [0; 5];
+            let v_1 = Vec::from(t_1);
+            let v_2 = vec![1, 2, 3];
+            let v_3: Vec<usize> = (1..=100).collect();
+        }
+
+        const GLOBAL_CONST_VALUE: &'static str = "我是常量";
+        static GLOBAL_STATIC_VALUE: &'static str = "我是不可变静态变量";
+        static mut GLOBAL_STATIC_MUT_VALUE: &'static str = "我是可变静态变量";
+        pub fn const_static_test() {
+            println!("{}", GLOBAL_CONST_VALUE);
+            // GLOBAL_CONST_VALUE = "I'm a new value"; //invalid left-hand side of assignment: Undefined behavior
+            println!("{}", GLOBAL_STATIC_VALUE);
+            // GLOBAL_STATIC_MUT_VALUE = "I'm a new value"; // cannot assign to immutable static item `GLOBAL_STATIC_MUT_VALUE`
+            unsafe {
+                println!("{}", GLOBAL_STATIC_MUT_VALUE);
+                GLOBAL_STATIC_MUT_VALUE = "重生之我在安全的 Rust 中用 unsafe";
+                println!("updated: {}", GLOBAL_STATIC_MUT_VALUE);
+            }
+        }
+    }
 }
 
 mod owership {
