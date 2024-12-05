@@ -17,8 +17,10 @@ use tracing_subscriber::EnvFilter;
 // 允许组合多个网络协议行为（Kademlia DHT + mDNS 服务发现）
 #[derive(NetworkBehaviour)]
 struct Behavior {
-    kademlia: kad::Behaviour<MemoryStore>, // Kademlia 分布式哈希表：用于节点路由和数据存储
-    mdns: mdns::tokio::Behaviour,           // mDNS 本地服务发现：在局域网内自动发现对等节点
+    // Kademlia 分布式哈希表：用于节点路由和数据存储
+    kademlia: kad::Behaviour<MemoryStore>, 
+    // mDNS 本地服务发现：在局域网内自动发现对等节点
+    mdns: mdns::tokio::Behaviour,          
 }
 
 #[tokio::main]

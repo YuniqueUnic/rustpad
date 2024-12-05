@@ -1,4 +1,4 @@
-use rustpad::{
+use chaos::{
     extract_srt::{extract_to, Separator},
     rustl1,
 };

@@ -538,6 +538,7 @@ dependencies = [
 name = "dkvstore"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "async-trait",
  "futures",
  "libp2p",
