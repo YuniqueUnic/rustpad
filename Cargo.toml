@@ -1,16 +1,32 @@
-[package]
+[workspace.package]
 name = "rustpad"
 version = "0.1.0"
 edition = "2021"
 
+[workspace]
+members = [
+    "examples/dkvstore",
+    "examples/rust-one-hour",
+    "examples/chaos",
+    "examples/smtpointers",
+]
+resolver = "2"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
-
-[[example]]
-name = "smtpointers"
-path = "examples/smtpointers/lib.rs"
-
-[[example]]
-name = "rustonehour"
-path = "examples/rust-one-hour/lib.rs"
+[workspace.dependencies]
+async-trait = "0.1.83"
+futures = "0.3.31"
+libp2p = { version = "0.54.1", features = [
+    "tokio",
+    "dns",
+    "kad",
+    "mdns",
+    "noise",
+    "macros",
+    "tcp",
+    "yamux",
+] }
+tokio = { version = "1.42.0", features = ["full"] }
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
