@@ -1,3 +1,5 @@
+mod refactor;
+
 use std::time::Duration;
 
 use futures::StreamExt;
@@ -13,6 +15,7 @@ use tokio::{
     io::{self, AsyncBufReadExt},
     select,
 };
+use tracing::event;
 use tracing_subscriber::EnvFilter;
 
 // NetworkBehaviour 派生宏：自动实现网络行为的委托和集成
@@ -72,6 +75,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // listen on all interfaces and whatever port the OS assigns.
     swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
 
+
     // kick it off
     loop {
         select! {
@@ -88,11 +92,63 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                    }
                 },
                 // todo: handle other events
+                SwarmEvent::Behaviour(BehaviorEvent::Kademlia(kad::Event::OutboundQueryProgressed { result,.. })) =>{
+                    match result {
+                        kad::QueryResult::GetProviders(Ok(kad::GetProvidersOk::FoundProviders { key, providers })) => {
+                            for peer in providers {
+                                println!("Found provider {} for key {}", peer, std::str::from_utf8(key.as_ref()).unwrap());
+                            }
+                        },
+                        kad::QueryResult::GetProviders(Ok(kad::GetProvidersOk::FinishedWithNoAdditionalRecord { closest_peers })) => {
+                            for peer in closest_peers {
+                                println!("Found closest_peers: ({}) ", peer);
+                            }
+                        },
+                        kad::QueryResult::GetProviders(Err(e)) => {
+                            eprintln!("GetProviders error: {:?}", e);
+                        },
+                        kad::QueryResult::GetRecord(Ok(kad::GetRecordOk::FoundRecord(kad::PeerRecord{record:kad::Record{key,value,..},..}))) => {
+                            println!("Found record {} for key {}", 
+                            std::str::from_utf8(value.as_ref()).unwrap(), 
+                            std::str::from_utf8(key.as_ref()).unwrap());
+                        },
+                        kad::QueryResult::GetRecord(Ok(kad::GetRecordOk::FinishedWithNoAdditionalRecord { cache_candidates })) => {
+                            for (kb_distance,peer_id) in cache_candidates {
+                                println!("Found cache_candidate: ({}) with kb_distance: ({:?})", peer_id, kb_distance.ilog2());
+                            }
+                        },
+                        kad::QueryResult::GetRecord(Err(e)) => {
+                            eprint!("GetRecord error: {:?}", e);
+                        },
+                        kad::QueryResult::PutRecord(Ok(
+                             kad::PutRecordOk{key}
+                        )) => {
+                            println!("Put record {}", std::str::from_utf8(key.as_ref()).unwrap());
+                        },
+                        kad::QueryResult::PutRecord(Err(e)) => {
+                            eprintln!("Put record error: {:?}", e);
+                        },
+                        kad::QueryResult::StartProviding(Ok(kad::AddProviderOk{key})) => {
+                            println!("Started providing {}", std::str::from_utf8(key.as_ref()).unwrap());
+                        },
+                        kad::QueryResult::StartProviding(Err(e)) => {
+                            eprintln!("StartProviding error: {:?}", e);
+                        },
+                        _=>{    
+                            println!("None handler for event");
+                        }
+                        // kad::QueryResult::Bootstrap(bootstrap_ok) => todo!(),
+                        // kad::QueryResult::GetClosestPeers(get_closest_peers_ok) => todo!(),
+                        // kad::QueryResult::RepublishProvider(add_provider_ok) => todo!(),
+                        // kad::QueryResult::RepublishRecord(put_record_ok) => todo!()
+                    }
+                },
                 _=>{
-                    println!("None handler for event: {:30?}",event);
+                    // println!("None handler for event: {:30?}",event);
                 }
             }
         }
+        
     }
 
     Ok(())
@@ -113,6 +169,7 @@ fn handle_input_line(kademlia: &mut kad::Behaviour<MemoryStore>, line: String) {
                     }
                 }
             };
+            kademlia.get_record(key);
         }
         Some("GET_PROVIDERS") => {
             let key = {
