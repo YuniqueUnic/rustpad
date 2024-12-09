@@ -34,7 +34,7 @@ impl IdentifyBehaviour {
 #[tokio::main]
 async fn main() -> Result<()> {
     let _ = tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::default())
+        .with_env_filter(EnvFilter::from_default_env())
         .try_init();
 
     let rendezvous_server_addr = SERVER_MULTIADDR.parse::<multiaddr::Multiaddr>()?;

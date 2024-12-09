@@ -37,7 +37,7 @@ impl RenderzvousServerBehaviour {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Starting rendezvous server...");
     let _ = tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::default())
+        .with_env_filter(EnvFilter::from_default_env())
         .try_init();
 
     let key_pair = libp2p::identity::Keypair::ed25519_from_bytes([0; 32]).unwrap();
