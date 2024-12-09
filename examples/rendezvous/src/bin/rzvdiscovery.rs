@@ -96,7 +96,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 SwarmEvent::Behaviour(DiscoveryBehaviourEvent::Ping(ping::Event {
                     peer,
-                    result: Ok(rtt),
+                    result: Ok(rtt), // RTT: round-trip time - 往返时间
                     ..
                 })) if peer != rendezvous_point => {
                     println!("Ping to {} successful in {:?}ms", peer, rtt.as_millis());
