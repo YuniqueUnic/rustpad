@@ -1,5 +1,5 @@
 [package]
-name = "renderzvous"
+name = "rendezvous"
 version.workspace = true
 edition.workspace = true
 

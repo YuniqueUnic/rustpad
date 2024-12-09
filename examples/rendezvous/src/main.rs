@@ -1,9 +1,9 @@
-use std::{default, time::Duration};
+use std::time::Duration;
 
 use futures::StreamExt;
 use libp2p::{
     identify,
-    identity::{self, Keypair},
+    identity::Keypair,
     ping, rendezvous,
     swarm::{NetworkBehaviour, SwarmEvent},
 };
