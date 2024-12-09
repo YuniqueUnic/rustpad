@@ -9,7 +9,7 @@ members = [
     "examples/rust-one-hour",
     "examples/chaos",
     "examples/smtpointers",
-    "examples/renderzvous",
+    "examples/rendezvous",
 ]
 resolver = "2"
 
