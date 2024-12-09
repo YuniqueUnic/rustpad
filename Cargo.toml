@@ -9,6 +9,7 @@ members = [
     "examples/rust-one-hour",
     "examples/chaos",
     "examples/smtpointers",
+    "examples/renderzvous",
 ]
 resolver = "2"
 
@@ -19,6 +20,7 @@ anyhow = "1.0.94"
 async-trait = "0.1.83"
 futures = "0.3.31"
 libp2p = { version = "0.54.1", features = [
+    "identify",
     "tokio",
     "dns",
     "kad",
@@ -27,6 +29,8 @@ libp2p = { version = "0.54.1", features = [
     "macros",
     "tcp",
     "yamux",
+    "rendezvous",
+    "ping",
 ] }
 tokio = { version = "1.42.0", features = ["full"] }
 tracing = "0.1.41"
