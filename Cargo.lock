@@ -7013,7 +7013,10 @@ dependencies = [
 name = "wordecar"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "bevy",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

@@ -1,8 +1,21 @@
 [package]
 name = "wordecar"
 description = "Word E-car is game built on bevy engine and it is helpful to learn new words in a fun way which control the e-car running safely."
-version.workspace = true
+version = "0.1.0"
 edition.workspace = true
 
+
+[profile.dev]
+opt-level = 1
+
 [dependencies]
-bevy = "0.15.0"
+bevy = { version = "0.15.0" }
+# , features = [
+#     "bevy/dynamic",
+#     "bevy/ecs",
+#     "bevy/reflect",
+#     "bevy/utils",
+# ]
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
