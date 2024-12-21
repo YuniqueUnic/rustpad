@@ -1,0 +1,8 @@
+[package]
+name = "wordecar"
+description = "Word E-car is game built on bevy engine and it is helpful to learn new words in a fun way which control the e-car running safely."
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+bevy = "0.15.0"
