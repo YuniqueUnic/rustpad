@@ -1,0 +1,758 @@
+[
+    {
+        "en": "abandon",
+        "zh": "放弃",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "ability",
+        "zh": "能力",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "absent",
+        "zh": "缺席的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "absolute",
+        "zh": "绝对的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "absorb",
+        "zh": "吸收",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "abstract",
+        "zh": "抽象的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "abundant",
+        "zh": "丰富的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "abuse",
+        "zh": "滥用",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "academic",
+        "zh": "学术的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "accelerate",
+        "zh": "加速",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "accent",
+        "zh": "口音",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "accept",
+        "zh": "接受",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "access",
+        "zh": "进入",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "accident",
+        "zh": "事故",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "accommodation",
+        "zh": "住宿",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "accompany",
+        "zh": "陪伴",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "accomplish",
+        "zh": "完成",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "accord",
+        "zh": "一致",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "account",
+        "zh": "账户",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "accumulate",
+        "zh": "积累",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "accurate",
+        "zh": "准确的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "accuse",
+        "zh": "指责",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "accustomed",
+        "zh": "习惯的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "ache",
+        "zh": "疼痛",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "achieve",
+        "zh": "实现",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "acid",
+        "zh": "酸的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "acknowledge",
+        "zh": "承认",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "acquire",
+        "zh": "获得",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "acre",
+        "zh": "英亩",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "across",
+        "zh": "穿过",
+        "type": "prep",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "act",
+        "zh": "行动",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "action",
+        "zh": "行动",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "active",
+        "zh": "活跃的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "activity",
+        "zh": "活动",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "actor",
+        "zh": "演员",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "actress",
+        "zh": "女演员",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "actual",
+        "zh": "实际的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "acute",
+        "zh": "敏锐的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "ad",
+        "zh": "广告",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "adapt",
+        "zh": "适应",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "add",
+        "zh": "添加",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "addict",
+        "zh": "上瘾者",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "addition",
+        "zh": "增加",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "address",
+        "zh": "地址",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "adequate",
+        "zh": "充足的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "adhere",
+        "zh": "坚持",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "adjacent",
+        "zh": "邻近的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "adjective",
+        "zh": "形容词",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "adjust",
+        "zh": "调整",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "administer",
+        "zh": "管理",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "administration",
+        "zh": "管理",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "admire",
+        "zh": "钦佩",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "admission",
+        "zh": "承认",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "admit",
+        "zh": "承认",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "adolescent",
+        "zh": "青少年",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "adopt",
+        "zh": "采用",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "adore",
+        "zh": "崇拜",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "adult",
+        "zh": "成年人",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "advance",
+        "zh": "前进",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "advanced",
+        "zh": "先进的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "advantage",
+        "zh": "优势",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "adventure",
+        "zh": "冒险",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "adverb",
+        "zh": "副词",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "advertise",
+        "zh": "做广告",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "advice",
+        "zh": "建议",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "advise",
+        "zh": "建议",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "advocate",
+        "zh": "提倡",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "aerial",
+        "zh": "空中的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "aeroplane",
+        "zh": "飞机",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "aesthetic",
+        "zh": "审美的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "affair",
+        "zh": "事情",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "affect",
+        "zh": "影响",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "affection",
+        "zh": "喜爱",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "affiliate",
+        "zh": "附属机构",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "affirm",
+        "zh": "肯定",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "afford",
+        "zh": "负担得起",
+        "type": "verb",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "afraid",
+        "zh": "害怕的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "Africa",
+        "zh": "非洲",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "African",
+        "zh": "非洲的",
+        "type": "adjective",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "after",
+        "zh": "在...之后",
+        "type": "prep",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "afternoon",
+        "zh": "下午",
+        "type": "noun",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "afterward(s)",
+        "zh": "后来",
+        "type": "adv",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "again",
+        "zh": "再一次",
+        "type": "adv",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    },
+    {
+        "en": "against",
+        "zh": "反对",
+        "type": "prep",
+        "level": "4",
+        "learned": false,
+        "master": false,
+        "last_time": "2024-12-21T00:00:00Z"
+    }
+]
