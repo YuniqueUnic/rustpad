@@ -8,35 +8,37 @@ use bevy::{
     time,
     window::{PresentMode, WindowLevel, WindowTheme},
 };
+use wordecar::breakout;
 
 fn main() {
     env::set_var("WGPU_BACKEND", "vulkan");
-    App::new()
-        .add_plugins((
-            DefaultPlugins.set(WindowPlugin {
-                primary_window: Some(Window {
-                    title: "Word E-car".to_string(),
-                    resolution: (800., 600.).into(),
-                    present_mode: PresentMode::AutoVsync,
-                    prevent_default_event_handling: false,
-                    window_theme: Some(WindowTheme::Light),
-                    enabled_buttons: bevy::window::EnabledButtons {
-                        maximize: false,
-                        ..Default::default()
-                    },
-                    visible: false, // avoid flashing
-                    ..default()
-                }),
-                ..default()
-            }),
-            LogDiagnosticsPlugin::default(),
-            FrameTimeDiagnosticsPlugin,
-        ))
-        .add_systems(
-            Update,
-            (switch_win_level, keyboard_input_system, make_visible),
-        )
-        .run();
+    // App::new()
+    //     .add_plugins((
+    //         DefaultPlugins.set(WindowPlugin {
+    //             primary_window: Some(Window {
+    //                 title: "Word E-car".to_string(),
+    //                 resolution: (800., 600.).into(),
+    //                 present_mode: PresentMode::AutoVsync,
+    //                 prevent_default_event_handling: false,
+    //                 window_theme: Some(WindowTheme::Light),
+    //                 enabled_buttons: bevy::window::EnabledButtons {
+    //                     maximize: false,
+    //                     ..Default::default()
+    //                 },
+    //                 visible: false, // avoid flashing
+    //                 ..default()
+    //             }),
+    //             ..default()
+    //         }),
+    //         LogDiagnosticsPlugin::default(),
+    //         FrameTimeDiagnosticsPlugin,
+    //     ))
+    //     .add_systems(
+    //         Update,
+    //         (switch_win_level, keyboard_input_system, make_visible),
+    //     )
+    //     .run();
+    breakout::run();
 }
 
 #[derive(Component)]
