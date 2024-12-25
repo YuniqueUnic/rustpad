@@ -3,10 +3,10 @@ use bevy::{
     asset::{AssetServer, Assets, Handle},
     audio::{AudioPlayer, AudioSource, PlaybackSettings},
     color::Color,
-    input::{keyboard::KeyboardInput, ButtonInput},
+    input::ButtonInput,
     math::{
         bounding::{Aabb2d, BoundingCircle, BoundingVolume, IntersectsVolume},
-        vec2, Quat, Vec2, Vec3,
+        Vec2, Vec3,
     },
     prelude::{
         BuildChildren, Camera2d, Circle, Commands, Component, Deref, DerefMut, Entity, Event,
@@ -27,6 +27,7 @@ const PADDLE_SIZE: Vec2 = Vec2::new(120.0, 20.0);
 const PADDLE_SPEED: f32 = 500.0;
 const PADDLE_PADDING: f32 = 10.0;
 const GAP_BETWEEN_PADDLE_AND_FLOOR: f32 = 60.0;
+const GAP_BETWEEN_PADDLE_AND_BRICKS: f32 = 270.0;
 
 // ################
 // ball
@@ -87,10 +88,7 @@ const TOP_WALL: f32 = 300.;
 struct Score(u32);
 
 #[derive(Resource)]
-struct ClearColor(pub Color);
-
-#[derive(Event, Default)]
-struct CollisionEvent;
+struct ClearColor(Color);
 
 #[derive(Component)]
 struct Paddle;
@@ -101,8 +99,11 @@ struct Ball;
 #[derive(Component)]
 struct Brick;
 
-#[derive(Resource)]
-struct CollisionSound(pub Handle<AudioSource>);
+#[derive(Event, Default)]
+struct CollisionEvent;
+
+#[derive(Resource, Deref)]
+struct CollisionSound(Handle<AudioSource>);
 
 #[derive(Component, Default)]
 struct Collider;
@@ -135,43 +136,33 @@ enum WallLocation {
 impl WallLocation {
     fn position(&self) -> Vec2 {
         match self {
-            WallLocation::Left => Vec2::new(LEFT_WALL, 0.0),
-            WallLocation::Top => Vec2::new(0.0, TOP_WALL),
-            WallLocation::Right => Vec2::new(RIGHT_WALL, 0.0),
-            WallLocation::Bottom => Vec2::new(0.0, BOTTOM_WALL),
+            WallLocation::Left => Vec2::new(LEFT_WALL, 0.),
+            WallLocation::Right => Vec2::new(RIGHT_WALL, 0.),
+            WallLocation::Bottom => Vec2::new(0., BOTTOM_WALL),
+            WallLocation::Top => Vec2::new(0., TOP_WALL),
         }
     }
 
     fn size(&self) -> Vec2 {
         let arena_height = TOP_WALL - BOTTOM_WALL;
         let arena_width = RIGHT_WALL - LEFT_WALL;
-
+        // Make sure we haven't messed up our constants
         assert!(arena_height > 0.0);
         assert!(arena_width > 0.0);
 
         match self {
             WallLocation::Left | WallLocation::Right => {
-                Vec2::new(WALL_THICKNESS, WALL_THICKNESS + arena_height)
+                Vec2::new(WALL_THICKNESS, arena_height + WALL_THICKNESS)
             }
-            WallLocation::Top | WallLocation::Bottom => {
-                Vec2::new(WALL_THICKNESS + arena_width, WALL_THICKNESS)
+            WallLocation::Bottom | WallLocation::Top => {
+                Vec2::new(arena_width + WALL_THICKNESS, WALL_THICKNESS)
             }
         }
     }
 }
 
-#[derive(Component)]
-struct Velocity(pub Vec2);
-
-impl Velocity {
-    pub fn x(&self) -> f32 {
-        self.0.x
-    }
-
-    pub fn y(&self) -> f32 {
-        self.0.y
-    }
-}
+#[derive(Component, Deref, DerefMut)]
+struct Velocity(Vec2);
 
 #[derive(Component)]
 struct ScoreboardUi;
@@ -233,6 +224,7 @@ fn setup(
         MeshMaterial2d(materials.add(BALL_COLOR)),
         Transform::from_translation(BALL_STARTING_POSITION)
             .with_scale(Vec2::splat(BALL_DIAMETER).extend(1.)),
+        Ball,
         Velocity(INITIAL_BALL_DIRECTION.normalize() * BALL_SPEED),
     ));
 
@@ -268,8 +260,8 @@ fn setup(
     cmds.spawn(Wall::new(WallLocation::Bottom));
 
     // bricks
-    let total_width_of_bricks = (RIGHT_WALL - LEFT_WALL) - 2.0 * GAP_BETWEEN_BRICKS_AND_SIDES;
-    let bottom_edge_of_bricks = paddle_y + GAP_BETWEEN_PADDLE_AND_FLOOR;
+    let total_width_of_bricks = (RIGHT_WALL - LEFT_WALL) - 2. * GAP_BETWEEN_BRICKS_AND_SIDES;
+    let bottom_edge_of_bricks = paddle_y + GAP_BETWEEN_PADDLE_AND_BRICKS;
     let total_height_of_bricks = TOP_WALL - bottom_edge_of_bricks - GAP_BETWEEN_BRICKS_AND_CEILING;
 
     assert!(total_width_of_bricks > 0.0);
@@ -281,10 +273,10 @@ fn setup(
 
     let center_of_bricks = (LEFT_WALL + RIGHT_WALL) / 2.0;
     let left_edge_of_bricks = center_of_bricks
-    // Space taken up by the bricks
-    - (n_columns as f32 / 2.0 * BRICK_SIZE.x)
-    // Space taken up by the gaps
-    - n_vertical_gaps as f32 / 2.0 * GAP_BETWEEN_BRICKS;
+        // Space taken up by the bricks
+        - (n_columns as f32 / 2.0 * BRICK_SIZE.x)
+        // Space taken up by the gaps
+        - n_vertical_gaps as f32 / 2.0 * GAP_BETWEEN_BRICKS;
 
     // In Bevy, the `translation` of an entity describes the center point,
     // not its bottom-left corner
@@ -303,7 +295,7 @@ fn setup(
                 Sprite::from_color(BRICK_COLOR, Vec2::ONE),
                 Transform {
                     translation: brick_position.extend(0.0),
-                    scale: BRICK_SIZE.extend(1.0),
+                    scale: Vec3::new(BRICK_SIZE.x, BRICK_SIZE.y, 1.0),
                     ..Default::default()
                 },
                 Brick,
@@ -336,13 +328,10 @@ fn move_paddle(
     paddle_transform.translation.x = new_paddle_pos.clamp(left_bound, right_bound);
 }
 
-fn apply_velocity(
-    mut query: Query<(&mut Transform, &Velocity), (With<Transform>, With<Velocity>)>,
-    time: Res<Time>,
-) {
+fn apply_velocity(mut query: Query<(&mut Transform, &Velocity)>, time: Res<Time>) {
     for (mut transform, velocity) in &mut query {
-        transform.translation.x += velocity.x() * time.delta_secs();
-        transform.translation.y += velocity.y() * time.delta_secs();
+        transform.translation.x += velocity.x * time.delta_secs();
+        transform.translation.y += velocity.y * time.delta_secs();
     }
 }
 
@@ -351,7 +340,7 @@ fn update_scoreboard(
     score_root: Single<Entity, (With<ScoreboardUi>, With<Text>)>,
     mut writer: TextUiWriter,
 ) {
-    *writer.text(*score_root, 1) = (*score).to_string()
+    *writer.text(*score_root, 1) = score.to_string();
 }
 
 fn check_for_collisions(
@@ -359,7 +348,7 @@ fn check_for_collisions(
     mut score: ResMut<Score>,
     ball_query: Single<(&mut Velocity, &Transform), With<Ball>>,
     collider_query: Query<(Entity, &Transform, Option<&Brick>), With<Collider>>,
-    mut collision_event: EventWriter<CollisionEvent>,
+    mut collision_events: EventWriter<CollisionEvent>,
 ) {
     let (mut ball_velocity, ball_transform) = ball_query.into_inner();
 
@@ -373,7 +362,7 @@ fn check_for_collisions(
         );
 
         if let Some(collision) = collision {
-            collision_event.send_default();
+            collision_events.send_default();
 
             if maybe_brick.is_some() {
                 commands.entity(collider_entity).despawn();
@@ -387,18 +376,18 @@ fn check_for_collisions(
             // reflect only if the velocity is in the opposite direction of the collision
             // This prevents the ball from getting stuck inside the ball
             match collision {
-                Collision::Left => reflect_x = ball_velocity.x() > 0.0,
-                Collision::Top => reflect_y = ball_velocity.y() < 0.0,
-                Collision::Right => reflect_x = ball_velocity.x() < 0.0,
-                Collision::Bottom => reflect_y = ball_velocity.y() > 0.0,
+                Collision::Left => reflect_x = ball_velocity.x > 0.0,
+                Collision::Right => reflect_x = ball_velocity.x < 0.0,
+                Collision::Top => reflect_y = ball_velocity.y < 0.0,
+                Collision::Bottom => reflect_y = ball_velocity.y > 0.0,
             }
 
             if reflect_x {
-                ball_velocity.0.x = -ball_velocity.x();
+                ball_velocity.x = -ball_velocity.x;
             }
 
             if reflect_y {
-                ball_velocity.0.y = -ball_velocity.y();
+                ball_velocity.y = -ball_velocity.y;
             }
         }
     }
@@ -414,13 +403,13 @@ enum Collision {
 
 fn play_collision_sound(
     mut cmds: Commands,
-    mut collision_event: EventReader<CollisionEvent>,
+    mut collision_events: EventReader<CollisionEvent>,
     sound: Res<CollisionSound>,
 ) {
-    if !collision_event.is_empty() {
+    if !collision_events.is_empty() {
         // This prevents events staying active on the next frame.
-        collision_event.clear();
-        cmds.spawn((AudioPlayer(sound.0.clone()), PlaybackSettings::DESPAWN));
+        collision_events.clear();
+        cmds.spawn((AudioPlayer(sound.clone()), PlaybackSettings::DESPAWN));
     }
 }
 
@@ -432,7 +421,6 @@ fn ball_collision(ball: BoundingCircle, bounding_box: Aabb2d) -> Option<Collisio
     }
 
     let closest = bounding_box.closest_point(ball.center());
-
     let offset = ball.center() - closest;
 
     let side = if offset.x.abs() > offset.y.abs() {

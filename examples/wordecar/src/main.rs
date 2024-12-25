@@ -1,13 +1,6 @@
 use std::env;
 
-use bevy::{
-    core::FrameCount,
-    diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
-    prelude::*,
-    state::commands,
-    time,
-    window::{PresentMode, WindowLevel, WindowTheme},
-};
+use bevy::{core::FrameCount, prelude::*, window::WindowLevel};
 use wordecar::breakout;
 
 fn main() {
@@ -39,6 +32,7 @@ fn main() {
     //     )
     //     .run();
     breakout::run();
+    // bo::run();
 }
 
 #[derive(Component)]
