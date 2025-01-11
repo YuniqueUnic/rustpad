@@ -1,244 +1,232 @@
+
+use std::time::Duration;
+
 use futures::StreamExt;
+// use anyhow::{Ok, Result};
 use libp2p::{
     kad::{self, store::MemoryStore},
     mdns, noise,
     swarm::{NetworkBehaviour, SwarmEvent},
-    tcp, yamux, StreamProtocol, SwarmBuilder,
+    tcp, yamux, SwarmBuilder,
 };
-use std::time::Duration;
 use tokio::{
     self,
     io::{self, AsyncBufReadExt},
     select,
 };
-use tracing::{error, warn};
+use tracing::event;
 use tracing_subscriber::EnvFilter;
 
-// Network Behaviour: combining Kademlia DHT and mDNS
+// NetworkBehaviour 派生宏：自动实现网络行为的委托和集成
+// 允许组合多个网络协议行为（Kademlia DHT + mDNS 服务发现）
 #[derive(NetworkBehaviour)]
-struct KadMdnsBehaviour {
-    kademlia: kad::Behaviour<MemoryStore>,
-    mdns: mdns::tokio::Behaviour,
+struct Behavior {
+    kademlia: kad::Behaviour<MemoryStore>, // Kademlia 分布式哈希表：用于节点路由和数据存储
+    mdns: mdns::tokio::Behaviour,          // mDNS 本地服务发现：在局域网内自动发现对等节点
 }
 
-impl KadMdnsBehaviour {
-    fn new(key: &libp2p::identity::Keypair) -> Result<Self, Box<dyn std::error::Error>> {
-        Ok(KadMdnsBehaviour {
-            kademlia: kad::Behaviour::new(
-                key.public().to_peer_id(),
-                MemoryStore::new(key.public().to_peer_id()),
-            ),
-            mdns: mdns::tokio::Behaviour::new(mdns::Config::default(), key.public().to_peer_id())?,
-        })
-    }
-}
-
-// Main function, entry point for async execution
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let _ = tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
         .try_init();
 
-    let key = libp2p::identity::Keypair::generate_ed25519();
-
-    warn!("Public key: ({})", key.public().to_peer_id());
-
-    let mut swarm = build_swarm(&key)?;
-
-    // Start listening on random port
-    swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
-
-    let mut stdin = io::BufReader::new(io::stdin()).lines();
-
-    loop {
-        select! {
-            Ok(Some(line)) = stdin.next_line() => {
-                handle_input_line(&mut swarm.behaviour_mut().kademlia, line);
-            }
-            event = swarm.select_next_some() => {
-                handle_swarm_event(event, &mut swarm);
-            }
-        }
-    }
-}
-
-fn build_swarm(
-    key: &libp2p::identity::Keypair,
-) -> Result<libp2p::Swarm<KadMdnsBehaviour>, Box<dyn std::error::Error>> {
-    let behaviour = KadMdnsBehaviour::new(&key.clone())?;
-    let mut swarm = SwarmBuilder::with_existing_identity(key.clone())
-        .with_tokio()
+    // SwarmBuilder: 构建点对点网络的核心组件
+    let mut swarm = SwarmBuilder::with_new_identity()
+        .with_tokio() // 使用 Tokio 运行时进行异步网络操作
         .with_tcp(
-            tcp::Config::default(),
-            noise::Config::new,
-            yamux::Config::default,
+            tcp::Config::default(), // TCP 传输层配置：提供基础网络连接 |处理套接字创建和管理 | 支持 IPv4/IPv6
+            noise::Config::new,     // 安全传输层：Noise 协议，提供加密、身份验证和前向保密
+            yamux::Config::default, //多路复用协议：Yamux，在单个 TCP 连接上复用多个子流，提高网络效率和并发性
         )?
-        .with_behaviour(move |_| Ok(behaviour))?
-        .with_swarm_config(|c| c.with_idle_connection_timeout(Duration::from_secs(60)))
+        .with_behaviour(|key| {
+            // 网络行为配置
+            Ok(Behavior {
+                //Kademlia 分布式哈希表初始化：节点路由 | 去中心化数据存储 | 点对点服务发现
+                kademlia: kad::Behaviour::new(
+                    key.public().to_peer_id(),                   // 使用公钥生成唯一 PeerID
+                    MemoryStore::new(key.public().to_peer_id()), // 内存存储 DHT 数据
+                ),
+                // mDNS 本地服务发现：自动发现同一局域网内的节点
+                mdns: mdns::tokio::Behaviour::new(
+                    mdns::Config::default(),
+                    key.public().to_peer_id(),
+                )?,
+            })
+        })?
+        // with_swarm_config configuration: <details: What? When? Why?>
+        .with_swarm_config(
+            |c| 
+            // 空闲连接超时：释放未使用资源
+            c.with_idle_connection_timeout(Duration::from_secs(60)), // 连接池大小控制等等..
+                                                                     // .with_max_negotiating_inbound_streams(10)
+        )
         .build();
 
     swarm
         .behaviour_mut()
         .kademlia
-        .set_mode(Some(kad::Mode::Server));
+        .set_mode(Some(kad::Mode::Server)); // <details: What? When? Why?>
 
-    Ok(swarm)
-}
+    // read full lines from stdin
+    let mut stdin = io::BufReader::new(io::stdin()).lines();
 
-// Event handler for the swarm
-fn handle_swarm_event(
-    event: SwarmEvent<KadMdnsBehaviourEvent>,
-    swarm: &mut libp2p::Swarm<KadMdnsBehaviour>,
-) {
-    match event {
-        SwarmEvent::NewListenAddr { address, .. } => {
-            warn!("🦀 Listening on {:?}", address);
-        }
-        SwarmEvent::Behaviour(KadMdnsBehaviourEvent::Mdns(mdns::Event::Discovered(peers))) => {
-            for (peer_id, addr) in peers {
-                warn!("📡 Discovered peer {} at {}", peer_id, addr);
-                swarm
-                    .behaviour_mut()
-                    .kademlia
-                    .add_address(&peer_id, addr.clone());
-                // 立即尝试连接发现的节点
-                if let Err(e) = swarm.dial(addr.clone()) {
-                    warn!("Failed to dial address {}: {}", addr, e);
+    // listen on all interfaces and whatever port the OS assigns.
+    swarm.listen_on("/ip4/0.0.0.0/tcp/0".parse()?)?;
+
+
+    // kick it off
+    loop {
+        select! {
+            Ok(Some(line)) = stdin.next_line()=>{
+                handle_input_line(&mut swarm.behaviour_mut().kademlia, line);
+            }
+            event = swarm.select_next_some() => match event{
+                SwarmEvent::NewListenAddr{address,..}=>{
+                    println!("Listening on {:?}", address);
+                },
+                SwarmEvent::Behaviour(BehaviorEvent::Mdns(mdns::Event::Discovered(list)))=>{
+                   for (peer_id,multiaddr) in list {
+                        swarm.behaviour_mut().kademlia.add_address(&peer_id,multiaddr);
+                   }
+                },
+                // todo: handle other events
+                SwarmEvent::Behaviour(BehaviorEvent::Kademlia(kad::Event::OutboundQueryProgressed { result,.. })) =>{
+                    match result {
+                        kad::QueryResult::GetProviders(Ok(kad::GetProvidersOk::FoundProviders { key, providers })) => {
+                            for peer in providers {
+                                println!("Found provider {} for key {}", peer, std::str::from_utf8(key.as_ref()).unwrap());
+                            }
+                        },
+                        kad::QueryResult::GetProviders(Ok(kad::GetProvidersOk::FinishedWithNoAdditionalRecord { closest_peers })) => {
+                            for peer in closest_peers {
+                                println!("Found closest_peers: ({}) ", peer);
+                            }
+                        },
+                        kad::QueryResult::GetProviders(Err(e)) => {
+                            eprintln!("GetProviders error: {:?}", e);
+                        },
+                        kad::QueryResult::GetRecord(Ok(kad::GetRecordOk::FoundRecord(kad::PeerRecord{record:kad::Record{key,value,..},..}))) => {
+                            println!("Found record {} for key {}", 
+                            std::str::from_utf8(value.as_ref()).unwrap(), 
+                            std::str::from_utf8(key.as_ref()).unwrap());
+                        },
+                        kad::QueryResult::GetRecord(Ok(kad::GetRecordOk::FinishedWithNoAdditionalRecord { cache_candidates })) => {
+                            for (kb_distance,peer_id) in cache_candidates {
+                                println!("Found cache_candidate: ({}) with kb_distance: ({:?})", peer_id, kb_distance.ilog2());
+                            }
+                        },
+                        kad::QueryResult::GetRecord(Err(e)) => {
+                            eprint!("GetRecord error: {:?}", e);
+                        },
+                        kad::QueryResult::PutRecord(Ok(
+                             kad::PutRecordOk{key}
+                        )) => {
+                            println!("Put record {}", std::str::from_utf8(key.as_ref()).unwrap());
+                        },
+                        kad::QueryResult::PutRecord(Err(e)) => {
+                            eprintln!("Put record error: {:?}", e);
+                        },
+                        kad::QueryResult::StartProviding(Ok(kad::AddProviderOk{key})) => {
+                            println!("Started providing {}", std::str::from_utf8(key.as_ref()).unwrap());
+                        },
+                        kad::QueryResult::StartProviding(Err(e)) => {
+                            eprintln!("StartProviding error: {:?}", e);
+                        },
+                        _=>{    
+                            println!("None handler for event");
+                        }
+                        // kad::QueryResult::Bootstrap(bootstrap_ok) => todo!(),
+                        // kad::QueryResult::GetClosestPeers(get_closest_peers_ok) => todo!(),
+                        // kad::QueryResult::RepublishProvider(add_provider_ok) => todo!(),
+                        // kad::QueryResult::RepublishRecord(put_record_ok) => todo!()
+                    }
+                },
+                _=>{
+                    // println!("None handler for event: {:30?}",event);
                 }
             }
         }
-        SwarmEvent::ConnectionEstablished {
-            peer_id, endpoint, ..
-        } => {
-            warn!("📲 Connection established with peer: {}", peer_id);
-            // 添加连接的节点地址到 Kademlia
-            let addr = endpoint.get_remote_address();
-            swarm
-                .behaviour_mut()
-                .kademlia
-                .add_address(&peer_id, addr.clone());
-
-            // 尝试引导 Kademlia DHT
-            match swarm.behaviour_mut().kademlia.bootstrap() {
-                Ok(_) => warn!("🚀 Successfully bootstrapped Kademlia DHT"),
-                Err(e) => error!("❌ Failed to bootstrap Kademlia DHT: {}", e),
-            }
-        }
-        SwarmEvent::Behaviour(KadMdnsBehaviourEvent::Kademlia(
-            kad::Event::OutboundQueryProgressed { result, .. },
-        )) => {
-            handle_kad_query_result(result);
-        }
-        _ => {}
+        
     }
+
+    Ok(())
 }
 
-fn handle_kad_query_result(result: kad::QueryResult) {
-    match result {
-        kad::QueryResult::GetProviders(Ok(kad::GetProvidersOk::FoundProviders {
-            key,
-            providers,
-        })) => {
-            for peer in providers {
-                warn!(
-                    "Found provider {} for key {}",
-                    peer,
-                    String::from_utf8_lossy(key.as_ref())
-                );
-            }
-        }
-        kad::QueryResult::GetRecord(Ok(kad::GetRecordOk::FoundRecord(kad::PeerRecord {
-            peer,
-            record: kad::Record { key, value, .. },
-        }))) => {
-            warn!(
-                "Found record for key {}: {}",
-                String::from_utf8_lossy(key.as_ref()),
-                String::from_utf8_lossy(&value)
-            );
-        }
-        kad::QueryResult::PutRecord(Ok(kad::PutRecordOk { key })) => {
-            warn!(
-                "Successfully put record with key {}",
-                String::from_utf8_lossy(key.as_ref())
-            );
-        }
-        kad::QueryResult::StartProviding(Ok(kad::AddProviderOk { key })) => {
-            warn!(
-                "Started providing key {}",
-                String::from_utf8_lossy(key.as_ref())
-            );
-        }
-        _ => {}
-    }
-}
-
+const METHODS: [&'static str; 4] = ["GET", "PUT", "GET_PROVIDERS", "PUT_PROVIDER"];
 fn handle_input_line(kademlia: &mut kad::Behaviour<MemoryStore>, line: String) {
     let mut args = line.split_ascii_whitespace();
+
     match args.next() {
-        Some("GET") => handle_get(kademlia, args),
-        Some("PUT") => handle_put(kademlia, args),
-        Some("GET_PROVIDERS") => handle_get_providers(kademlia, args),
-        Some("PUT_PROVIDER") => handle_put_provider(kademlia, args),
-        _ => error!("Unknown command, expected one of: GET, PUT, GET_PROVIDERS, PUT_PROVIDER"),
-    }
-}
-
-fn handle_get(
-    kademlia: &mut kad::Behaviour<MemoryStore>,
-    mut args: std::str::SplitAsciiWhitespace,
-) {
-    if let Some(key) = args.next() {
-        kademlia.get_record(kad::RecordKey::new(&key));
-    } else {
-        error!("Missing key for GET");
-    }
-}
-
-fn handle_put(
-    kademlia: &mut kad::Behaviour<MemoryStore>,
-    mut args: std::str::SplitAsciiWhitespace,
-) {
-    if let Some(key) = args.next() {
-        if let Some(value) = args.next() {
-            let record = kad::Record {
-                key: kad::RecordKey::new(&key),
-                value: value.as_bytes().to_vec(),
-                publisher: None,
-                expires: None,
+        Some("GET") => {
+            let key = {
+                match args.next() {
+                    Some(key) => kad::RecordKey::new(&key),
+                    None => {
+                        eprint!("Expected a key");
+                        return;
+                    }
+                }
             };
-            kademlia
-                .put_record(record, kad::Quorum::One)
-                .expect("Failed to put record");
-        } else {
-            error!("Missing value for PUT");
+            kademlia.get_record(key);
         }
-    } else {
-        error!("Missing key for PUT");
-    }
-}
+        Some("GET_PROVIDERS") => {
+            let key = {
+                match args.next() {
+                    Some(key) => kad::RecordKey::new(&key), // <details: What? When? Why?>
+                    None => {
+                        eprint!("Expected a key");
+                        return;
+                    }
+                }
+            };
+            kademlia.get_providers(key);
+        }
+        Some("PUT") => {
+            let key = {
+                match args.next() {
+                    Some(key) => kad::RecordKey::new(&key),
+                    None => {
+                        eprint!("missing key");
+                        return;
+                    }
+                }
+            };
+            let value:Vec<u8> ={
+                match args.next() {
+                    Some(v)=> v.as_bytes().to_vec(), // <details: What? When? Why?>
+                    None=>{
+                        eprint!("Expected value");
+                        return;
+                    }
+                }
+            };
+            let record = kad::Record{
+                key,
+                value,
+                publisher:None,
+                expires:None
+            };
+            kademlia.put_record(record, kad::Quorum::One) // <details: What? When? Why?>
+                    .expect("Failed to put record");
+        }
+        Some("PUT_PROVIDER") => {
+            let key = {
+                match args.next() {
+                    Some(key) => kad::RecordKey::new(&key),
+                    None => {
+                        eprint!("missing key");
+                        return;
+                    }
+                }
+            };
 
-fn handle_get_providers(
-    kademlia: &mut kad::Behaviour<MemoryStore>,
-    mut args: std::str::SplitAsciiWhitespace,
-) {
-    if let Some(key) = args.next() {
-        kademlia.get_providers(kad::RecordKey::new(&key));
-    } else {
-        error!("Missing key for GET_PROVIDERS");
-    }
-}
-
-fn handle_put_provider(
-    kademlia: &mut kad::Behaviour<MemoryStore>,
-    mut args: std::str::SplitAsciiWhitespace,
-) {
-    if let Some(key) = args.next() {
-        kademlia
-            .start_providing(kad::RecordKey::new(&key))
-            .expect("Failed to start providing");
-    } else {
-        error!("Missing key for PUT_PROVIDER");
+            kademlia.start_providing(key) // <details: What? When? Why?>
+                    .expect("Failed to start providing");
+        }
+        _ => {
+            eprintln!("unknown command");
+            eprintln!("Expecting one of: {:?}",METHODS);
+        }
     }
 }
